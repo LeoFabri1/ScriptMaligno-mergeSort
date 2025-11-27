@@ -24,7 +24,7 @@ echo 🔄 TESTE 2: VERSAO SEQUENCIAL
 echo -----------------------------
 echo ℹ️  Testando versão sequencial com vetor pequeno...
 
-java -cp out distributed.ContagemSequencial 1000 --missing
+java -cp out distributed.OrdenacaoSequencial 1000
 if %errorlevel% neq 0 (
     echo ❌ Falha na versão sequencial!
     exit /b 1
@@ -37,7 +37,7 @@ echo 📊 TESTE 3: VERSAO SEQUENCIAL - VETOR GRANDE
 echo --------------------------------------------
 echo ℹ️  Testando versão sequencial com vetor grande (1M elementos)...
 
-java -cp out distributed.ContagemSequencial 1000000
+java -cp out distributed.OrdenacaoSequencial 1000000
 if %errorlevel% neq 0 (
     echo ❌ Falha na versão sequencial com vetor grande!
     exit /b 1
@@ -64,7 +64,7 @@ echo ℹ️  Servidores R iniciados
 echo ℹ️  Testando sistema distribuído com vetor pequeno...
 
 REM Teste com vetor pequeno
-java -cp out distributed.Distribuidor localhost:12345 localhost:12346 localhost:12347 --tam 1000 --missing
+java -cp out distributed.Distribuidor localhost:12345 localhost:12346 localhost:12347 --tam 1000
 if %errorlevel% neq 0 (
     echo ❌ Falha no sistema distribuído com vetor pequeno!
     goto cleanup
@@ -103,7 +103,7 @@ echo 🔗 TESTE 7: SISTEMA DISTRIBUIDO - 2 SERVIDORES
 echo -----------------------------------------------
 echo ℹ️  Testando sistema distribuído com apenas 2 servidores...
 
-java -cp out distributed.Distribuidor localhost:12345 localhost:12346 --tam 50000 --missing
+java -cp out distributed.Distribuidor localhost:12345 localhost:12346 --tam 50000
 if %errorlevel% neq 0 (
     echo ❌ Falha no sistema distribuído com 2 servidores!
     goto cleanup
@@ -147,7 +147,7 @@ echo 📝 Para executar manualmente:
 echo    1. java -cp out distributed.ReceptorServer 0.0.0.0 12345
 echo    2. java -cp out distributed.ReceptorServer 0.0.0.0 12346
 echo    3. java -cp out distributed.ReceptorServer 0.0.0.0 12347
-echo    4. java -cp out distributed.Distribuidor localhost:12345 localhost:12346 localhost:12347 --tam 1000000 --missing
+echo    4. java -cp out distributed.Distribuidor localhost:12345 localhost:12346 localhost:12347 --tam 1000000
 echo.
 echo ✨ Sistema pronto para demonstração ao professor!
 goto end

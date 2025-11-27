@@ -44,7 +44,7 @@ print_success "Compilação OK!"
 
 # 2. Teste sequencial
 print_info "2. Testando versão sequencial..."
-java -cp out distributed.ContagemSequencial 1000 --missing
+java -cp out distributed.OrdenacaoSequencial 1000
 print_success "Sequencial OK!"
 
 # 3. Teste distribuído
@@ -52,7 +52,7 @@ print_info "3. Testando sistema distribuído..."
 print_info "IPs fornecidos: $*"
 echo ""
 
-java -cp out distributed.Distribuidor "$@" --tam 10000 --missing
+java -cp out distributed.Distribuidor "$@" --tam 10000
 
 if [ $? -eq 0 ]; then
     print_success "Teste distribuído OK!"

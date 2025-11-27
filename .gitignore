@@ -1,0 +1,31 @@
+# Arquivos compilados Java
+*.class
+out/
+**/out/
+
+# Arquivos de log
+*.log
+receptor-*.log
+
+# Configurações do IDE
+.idea/
+*.iml
+.vscode/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# PDFs de atividades (não necessários no repositório)
+Atividade*.pdf
+*.pdf
+
+# Scripts auxiliares de teste (opcionais)
+preparar_maquina.sh
+testar_conectividade.sh
+
+# Arquivos temporários
+*.tmp
+*.bak
+*~
+

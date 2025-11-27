@@ -3,58 +3,130 @@ package distributed;
 import java.io.*;
 import java.net.*;
 
+/**
+ * Programa R (Receptor) - Servidor que recebe pedidos de ordenação.
+ * 
+ * Este servidor fica aguardando conexões de clientes.
+ * Quando recebe um Pedido, ordena o vetor e retorna uma Resposta.
+ * 
+ * Uso: java ReceptorServer [host] [porta]
+ * Exemplo: java ReceptorServer 0.0.0.0 12345
+ */
 public class ReceptorServer {
+    
     public static void main(String[] args) {
-        String hostBind = args.length > 0 ? args[0] : "0.0.0.0"; // padrão
-        int porta = args.length > 1 ? Integer.parseInt(args[1]) : 12345; // padrão
-
-        try (ServerSocket servidor = new ServerSocket()) {
-            servidor.bind(new InetSocketAddress(hostBind, porta));
-            Log.info("R", "Servidor R ouvindo em " + hostBind + ":" + porta);
-
+        // Ler parâmetros da linha de comando
+        String host = "0.0.0.0";  // padrão: aceita conexões de qualquer IP
+        int porta = 12345;        // padrão: porta 12345
+        
+        if (args.length > 0) {
+            host = args[0];
+        }
+        if (args.length > 1) {
+            porta = Integer.parseInt(args[1]);
+        }
+        
+        try {
+            // Criar o socket servidor
+            ServerSocket servidor = new ServerSocket();
+            servidor.bind(new InetSocketAddress(host, porta));
+            
+            Log.info("R", "Servidor R ouvindo em " + host + ":" + porta);
+            Log.info("R", "Aguardando conexões de clientes...");
+            
+            // Loop infinito para aceitar múltiplas conexões
             while (true) {
+                // Aceitar uma conexão (bloqueia até chegar um cliente)
                 Socket conexao = servidor.accept();
+                
                 Log.info("R", "Conexão aceita de " + conexao.getRemoteSocketAddress());
-                new Thread(new Atendedor(conexao)).start(); // uma thread por cliente
+                
+                // Criar uma thread para atender este cliente
+                // Assim podemos atender múltiplos clientes ao mesmo tempo
+                Thread thread = new Thread(new Atendedor(conexao));
+                thread.start();
             }
+            
         } catch (IOException e) {
-            Log.error("R", "Falha ao iniciar servidor", e);
+            Log.error("R", "Erro ao iniciar servidor", e);
         }
     }
-
+    
+    /**
+     * Classe interna que atende um cliente específico.
+     * Cada cliente tem sua própria thread.
+     */
     private static class Atendedor implements Runnable {
-        private final Socket socket;
-        Atendedor(Socket s) { this.socket = s; }
-
-        @Override public void run() {
-            try (
-                ObjectOutputStream transmissor = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream  receptor    = new ObjectInputStream(socket.getInputStream())
-            ) {
+        private Socket socket;
+        
+        public Atendedor(Socket socket) {
+            this.socket = socket;
+        }
+        
+        @Override
+        public void run() {
+            try {
+                // Criar streams para enviar e receber objetos
+                ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
+                
+                // Loop para receber múltiplos pedidos do mesmo cliente
                 while (true) {
-                    Object obj = receptor.readObject();
-                    if (obj instanceof Pedido) {
-                        Pedido p = (Pedido) obj;
-                        Log.info("R", "Pedido recebido de " + socket.getRemoteSocketAddress() +
-                                " — procurando: " + p.getProcurado() + ", tamanho: " + p.getNumeros().length);
-                        int cont = p.contar(); // processar em paralelo
-                        transmissor.writeObject(new Resposta(cont));
-                        transmissor.flush();
-                    } else if (obj instanceof ComunicadoEncerramento) {
+                    // Ler objeto recebido
+                    Object objeto = entrada.readObject();
+                    
+                    // Verificar o tipo do objeto
+                    if (objeto instanceof Pedido) {
+                        // É um pedido de ordenação
+                        Pedido pedido = (Pedido) objeto;
+                        
+                        Log.info("R", "Pedido recebido de " + socket.getRemoteSocketAddress() + 
+                                " — tamanho: " + pedido.getNumeros().length);
+                        
+                        // Ordenar o vetor
+                        int[] vetorOrdenado = pedido.ordenar();
+                        
+                        // Criar resposta com o vetor ordenado
+                        Resposta resposta = new Resposta(vetorOrdenado);
+                        
+                        // Enviar resposta de volta para o cliente
+                        saida.writeObject(resposta);
+                        saida.flush();  // garantir que foi enviado
+                        
+                        Log.info("R", "Resposta enviada para " + socket.getRemoteSocketAddress());
+                        
+                    } else if (objeto instanceof ComunicadoEncerramento) {
+                        // Cliente quer encerrar a conexão
                         Log.warn("R", "Encerramento recebido de " + socket.getRemoteSocketAddress());
-                        break;
-                    } else if (obj instanceof Comunicado) {
-                        Log.warn("R", "Comunicado desconhecido: " + obj.getClass().getSimpleName());
+                        break;  // sair do loop
+                        
                     } else {
-                        Log.warn("R", "Objeto não suportado: " + obj.getClass());
+                        // Objeto desconhecido
+                        Log.warn("R", "Objeto desconhecido recebido: " + objeto.getClass().getSimpleName());
                     }
                 }
+                
+                // Fechar streams
+                entrada.close();
+                saida.close();
+                
             } catch (EOFException e) {
+                // Cliente fechou a conexão normalmente
                 Log.warn("R", "Cliente fechou a conexão: " + socket.getRemoteSocketAddress());
-            } catch (IOException | ClassNotFoundException e) {
+                
+            } catch (IOException e) {
                 Log.error("R", "Erro na conexão com cliente", e);
+                
+            } catch (ClassNotFoundException e) {
+                Log.error("R", "Erro ao ler objeto", e);
+                
             } finally {
-                try { socket.close(); } catch (IOException ignore) {}
+                // Sempre fechar o socket, mesmo se der erro
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    // Ignorar erro ao fechar
+                }
                 Log.info("R", "Conexão encerrada: " + socket.getRemoteSocketAddress());
             }
         }

@@ -65,7 +65,7 @@ print_success "Compilação completa!"
 
 # 2. Teste sequencial
 print_info "2. Testando versão sequencial..."
-if ! java -cp cliente/out:shared/out distributed.ContagemSequencial 1000 --missing; then
+if ! java -cp cliente/out:shared/out distributed.OrdenacaoSequencial 1000; then
     print_error "Falha na versão sequencial!"
     exit 1
 fi
@@ -100,7 +100,7 @@ echo ""
 
 # Teste com vetor pequeno
 print_info "Teste 1: Vetor pequeno (10K elementos)"
-java -cp cliente/out:shared/out distributed.Distribuidor 127.0.0.1:12345 127.0.0.1:12346 127.0.0.1:12347 --tam 10000 --missing
+java -cp cliente/out:shared/out distributed.Distribuidor 127.0.0.1:12345 127.0.0.1:12346 127.0.0.1:12347 --tam 10000
 
 if [ $? -eq 0 ]; then
     print_success "Teste 1 OK!"
@@ -113,7 +113,7 @@ echo ""
 
 # Teste com vetor médio
 print_info "Teste 2: Vetor médio (100K elementos)"
-java -cp cliente/out:shared/out distributed.Distribuidor 127.0.0.1:12345 127.0.0.1:12346 127.0.0.1:12347 --tam 100000 --missing
+java -cp cliente/out:shared/out distributed.Distribuidor 127.0.0.1:12345 127.0.0.1:12346 127.0.0.1:12347 --tam 100000
 
 if [ $? -eq 0 ]; then
     print_success "Teste 2 OK!"
@@ -126,7 +126,7 @@ echo ""
 
 # Teste com vetor grande
 print_info "Teste 3: Vetor grande (1M elementos)"
-java -cp cliente/out:shared/out distributed.Distribuidor 127.0.0.1:12345 127.0.0.1:12346 127.0.0.1:12347 --tam 1000000 --missing
+java -cp cliente/out:shared/out distributed.Distribuidor 127.0.0.1:12345 127.0.0.1:12346 127.0.0.1:12347 --tam 1000000
 
 if [ $? -eq 0 ]; then
     print_success "Teste 3 OK!"

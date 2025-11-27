@@ -78,7 +78,7 @@ sleep 3
 
 # 3. Teste sequencial
 print_info "3. Testando versão sequencial..."
-java -cp cliente/out:shared/out distributed.ContagemSequencial $TAMANHO --missing > /dev/null 2>&1
+java -cp cliente/out:shared/out distributed.OrdenacaoSequencial $TAMANHO > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     print_success "Sequencial OK!"
 else
@@ -96,7 +96,7 @@ COMANDO="java -cp cliente/out:shared/out distributed.Distribuidor"
 for servidor in "${SERVIDORES[@]}"; do
     COMANDO="$COMANDO $servidor"
 done
-COMANDO="$COMANDO --tam $TAMANHO --missing"
+COMANDO="$COMANDO --tam $TAMANHO"
 
 echo "Executando: $COMANDO"
 echo ""
