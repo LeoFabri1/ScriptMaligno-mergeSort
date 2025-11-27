@@ -2,6 +2,9 @@
 *.class
 out/
 **/out/
+cliente/out/
+servidor/out/
+shared/out/
 
 # Arquivos de log
 *.log

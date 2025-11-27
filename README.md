@@ -200,8 +200,6 @@ public final class Log {
 
 ### 📦 1. Compilação
 
-#### **Estrutura Separada (Recomendado para máquinas diferentes):**
-
 ```bash
 # Compilar classes compartilhadas
 javac -d shared/out shared/src/distributed/*.java
@@ -213,10 +211,13 @@ javac -cp shared/out -d servidor/out servidor/src/distributed/*.java
 javac -cp shared/out -d cliente/out cliente/src/distributed/*.java
 ```
 
-#### **Estrutura Unificada (Para teste local):**
-
+**Ou use os scripts de compilação:**
 ```bash
-javac -d out src/distributed/*.java
+# Compilar servidor
+cd servidor && ./compilar.sh
+
+# Compilar cliente
+cd cliente && ./compilar.sh
 ```
 
 ---
@@ -224,11 +225,7 @@ javac -d out src/distributed/*.java
 ### 🧪 2. Teste Sequencial (Referência)
 
 ```bash
-# Estrutura separada
 java -cp cliente/out:shared/out distributed.OrdenacaoSequencial 10000
-
-# Estrutura unificada
-java -cp out distributed.OrdenacaoSequencial 10000
 ```
 
 ---
@@ -242,11 +239,7 @@ Ideal para testar rapidamente na sua máquina local.
 ```bash
 cd /Users/leofabri/IdeaProjects/ScriptMalignoServidor-Client
 
-# Estrutura separada
 java -cp servidor/out:shared/out distributed.ReceptorServer 0.0.0.0 12345
-
-# OU estrutura unificada
-java -cp out distributed.ReceptorServer 0.0.0.0 12345
 ```
 
 **Você deve ver:**
@@ -263,11 +256,7 @@ java -cp out distributed.ReceptorServer 0.0.0.0 12345
 ```bash
 cd /Users/leofabri/IdeaProjects/ScriptMalignoServidor-Client
 
-# Estrutura separada
 java -cp servidor/out:shared/out distributed.ReceptorServer 0.0.0.0 12346
-
-# OU estrutura unificada
-java -cp out distributed.ReceptorServer 0.0.0.0 12346
 ```
 
 **Você deve ver:**
@@ -284,13 +273,7 @@ java -cp out distributed.ReceptorServer 0.0.0.0 12346
 ```bash
 cd /Users/leofabri/IdeaProjects/ScriptMalignoServidor-Client
 
-# Estrutura separada
 java -cp cliente/out:shared/out distributed.Distribuidor \
-  127.0.0.1:12345 127.0.0.1:12346 \
-  --tam 100000
-
-# OU estrutura unificada
-java -cp out distributed.Distribuidor \
   127.0.0.1:12345 127.0.0.1:12346 \
   --tam 100000
 ```
@@ -452,7 +435,7 @@ java -cp cliente/out:shared/out distributed.Distribuidor \
 
 ---
 
-### 🤖 5. Teste Automatizado (Recomendado para desenvolvimento)
+### 5. Teste Automatizado (Recomendado para desenvolvimento)
 
 O script automatiza tudo: compilação, inicialização de servidores e testes.
 
